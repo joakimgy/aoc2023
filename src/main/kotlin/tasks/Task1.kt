@@ -1,11 +1,5 @@
+import utils.indexesOf
 import utils.readRows
-
-val input = listOf(
-    "1abc2",
-    "pqr3stu8vwx",
-    "a1b2c3d4e5f",
-    "treb7uchet",
-)
 
 fun main() {
     part1()
@@ -13,48 +7,47 @@ fun main() {
 }
 
 fun part1() {
-    val sum = readRows("Task1_Input_1")
+    readRows("Task1_Input_1")
         .sumOf { row ->
             row.filter {
                 it.isDigit()
             }.let {
                 "${it.first()}${it.last()}".toInt()
             }
+        }.also {
+            println("Answer to task 1 part 1 is $it")
         }
-    println("Answer to task 1 part 1 is $sum")
 }
-
-data class NumberWithIndex(
-    val number: Int,
-    val index: Int,
-)
 
 fun part2() {
     val rows = readRows("Task1_Input_2")
-    val textNumbers = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
     rows
         .sumOf { row ->
-            val textNumbers = textNumbers.mapIndexed { index, text ->
-                val indexes = row.indexesOf(text)
-                if (indexes.isNotEmpty()) {
-                    indexes.map {
-                        NumberWithIndex(number = index + 1, index = it)
+            val numbersWithIndexFromText =
+                listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
+                    .mapIndexed { index, text ->
+                        val indexes = row.indexesOf(text)
+                        if (indexes.isNotEmpty()) {
+                            indexes.map {
+                                NumberWithIndex(number = index + 1, index = it)
+                            }
+                        } else {
+                            null
+                        }
                     }
-                } else {
-                    null
-                }
-            }
-                .filterNotNull()
-                .flatten()
+                    .filterNotNull()
+                    .flatten()
 
-            val actualNumbers = row.mapIndexed { index, char ->
-                if (char.isDigit()) {
-                    NumberWithIndex(number = "$char".toInt(), index = index)
-                } else {
-                    null
+            val numbersWithIndexFromDigit = row
+                .mapIndexedNotNull { index, char ->
+                    if (char.isDigit()) {
+                        NumberWithIndex(number = "$char".toInt(), index = index)
+                    } else {
+                        null
+                    }
                 }
-            }.mapNotNull { it }
-            (textNumbers + actualNumbers)
+
+            (numbersWithIndexFromText + numbersWithIndexFromDigit)
                 .let { numbers ->
                     val first = numbers.minBy { it.index }.number
                     val last = numbers.maxBy { it.index }.number
@@ -65,11 +58,7 @@ fun part2() {
         }
 }
 
-fun ignoreCaseOpt(ignoreCase: Boolean) =
-    if (ignoreCase) setOf(RegexOption.IGNORE_CASE) else emptySet()
-
-fun String?.indexesOf(pat: String, ignoreCase: Boolean = true): List<Int> =
-    pat.toRegex(ignoreCaseOpt(ignoreCase))
-        .findAll(this ?: "")
-        .map { it.range.first }
-        .toList()
+data class NumberWithIndex(
+    val number: Int,
+    val index: Int,
+)
