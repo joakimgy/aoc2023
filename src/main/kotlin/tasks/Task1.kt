@@ -25,7 +25,7 @@ fun part2() {
         .sumOf { row ->
             val numbersWithIndexFromText =
                 listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
-                    .mapIndexed { index, text ->
+                    .mapIndexedNotNull { index, text ->
                         val indexes = row.indexesOf(text)
                         if (indexes.isNotEmpty()) {
                             indexes.map {
@@ -35,7 +35,6 @@ fun part2() {
                             null
                         }
                     }
-                    .filterNotNull()
                     .flatten()
 
             val numbersWithIndexFromDigit = row
