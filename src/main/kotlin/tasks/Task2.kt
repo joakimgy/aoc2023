@@ -54,12 +54,15 @@ data class CubeSet(
 )
 
 fun rowToGame(row: String): Game {
-    val gameNumber = row.split(":").first().split(" ").last().toInt()
-    val set = row.split(":").last().split(";").map {
-        val blue = Regex("\\d+ blue").find(it)?.value?.split(" ")?.first()?.toInt()
-        val red = Regex("\\d+ red").find(it)?.value?.split(" ")?.first()?.toInt()
-        val green = Regex("\\d+ green").find(it)?.value?.split(" ")?.first()?.toInt()
+    val gameNumber = row.substringBefore(":").substringAfter(" ").toInt()
+    val set = row.substringAfter(":").split(";").map {
+        val blue = Regex("\\d+ blue").find(it)?.value?.substringBefore(" ")?.toInt()
+        val red = Regex("\\d+ red").find(it)?.value?.substringBefore(" ")?.toInt()
+        val green = Regex("\\d+ green").find(it)?.value?.substringBefore(" ")?.toInt()
         CubeSet(blue = blue ?: 0, red = red ?: 0, green = green ?: 0)
     }
     return Game(gameNumber = gameNumber, sets = set)
 }
+
+// The sum of valid game IDs is 2101
+// The sum of the power of these sets are 58269
