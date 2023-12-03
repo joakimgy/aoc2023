@@ -6,9 +6,9 @@ fun main() {
 }
 
 private fun part1() {
-    val symbols = findSymbols(null)
+    val allSymbols = findSymbols(null)
     findEngineParts()
-        .filter { it.isValidPartNumber(symbols) }
+        .filter { it.hasValidPartNumber(allSymbols) }
         .sumOf { it.number.toInt() }
         .let {
             println("The sum of the part numbers is $it")
@@ -18,7 +18,7 @@ private fun part1() {
 private fun part2() =
     findSymbols('*').mapNotNull { gearSymbol ->
         findEngineParts()
-            .filter { it.isValidPartNumber(listOf(gearSymbol)) }
+            .filter { it.hasValidPartNumber(listOf(gearSymbol)) }
             .let {
                 if (it.size == 2) {
                     it.map { n -> n.number.toInt() }.reduce(Int::times)
@@ -42,16 +42,12 @@ fun findSymbols(specificSymbol: Char?): List<Symbol> {
         row.mapIndexedNotNull { colIndex, char ->
             if (char.isDigit() || char == '.') {
                 null
+            } else if (specificSymbol == null) {
+                Symbol(coordinate = Coordinate(x = colIndex, y = rowIndex), symbol = char)
+            } else if (char == specificSymbol) {
+                Symbol(coordinate = Coordinate(x = colIndex, y = rowIndex), symbol = char)
             } else {
-                if (specificSymbol != null) {
-                    if (char == specificSymbol) {
-                        Symbol(coordinate = Coordinate(x = colIndex, y = rowIndex), symbol = char)
-                    } else {
-                        null
-                    }
-                } else {
-                    Symbol(coordinate = Coordinate(x = colIndex, y = rowIndex), symbol = char)
-                }
+                null
             }
         }
     }.flatten()
@@ -98,7 +94,7 @@ fun findEngineParts() =
                 }
         }.flatten()
 
-private fun EnginePart.isValidPartNumber(symbols: List<Symbol>): Boolean =
+private fun EnginePart.hasValidPartNumber(symbols: List<Symbol>): Boolean =
     symbols.any { symbol ->
         this.coordinates.any { coordinate ->
             (
