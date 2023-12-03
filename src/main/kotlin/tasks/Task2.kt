@@ -1,5 +1,3 @@
-package tasks
-
 import utils.readRows
 
 fun main() {
@@ -7,7 +5,7 @@ fun main() {
     part2()
 }
 
-fun part1() {
+private fun part1() {
     val rows = readRows("Task2_Input_1")
     val validCubes = CubeSet(red = 12, green = 13, blue = 14)
     rows
@@ -19,7 +17,7 @@ fun part1() {
         }
 }
 
-fun part2() {
+private fun part2() {
     val rows = readRows("Task2_Input_1")
     rows
         .map { rowToGame(it) }
@@ -33,7 +31,7 @@ fun part2() {
         }
 }
 
-fun Game.hasValidSets(validSet: CubeSet): Boolean {
+private fun Game.hasValidSets(validSet: CubeSet): Boolean {
     return this.sets
         .all {
             it.red <= validSet.red &&
@@ -42,18 +40,18 @@ fun Game.hasValidSets(validSet: CubeSet): Boolean {
         }
 }
 
-data class Game(
+private data class Game(
     val gameNumber: Int,
     val sets: List<CubeSet>,
 )
 
-data class CubeSet(
+private data class CubeSet(
     val blue: Int,
     val red: Int,
     val green: Int,
 )
 
-fun rowToGame(row: String): Game {
+private fun rowToGame(row: String): Game {
     val gameNumber = row.substringBefore(":").substringAfter(" ").toInt()
     val set = row.substringAfter(":").split(";").map {
         val blue = Regex("\\d+ blue").find(it)?.value?.substringBefore(" ")?.toInt()
@@ -63,6 +61,3 @@ fun rowToGame(row: String): Game {
     }
     return Game(gameNumber = gameNumber, sets = set)
 }
-
-// The sum of valid game IDs is 2101
-// The sum of the power of these sets are 58269

@@ -6,7 +6,7 @@ fun main() {
     part2()
 }
 
-fun part1() {
+private fun part1() {
     readRows("Task1_Input_1")
         .sumOf { row ->
             row.filter {
@@ -19,7 +19,7 @@ fun part1() {
         }
 }
 
-fun part2() {
+private fun part2() {
     val rows = readRows("Task1_Input_2")
     rows
         .sumOf { row ->
@@ -57,7 +57,7 @@ fun part2() {
         }
 }
 
-data class NumberWithIndex(
+private data class NumberWithIndex(
     val number: Int,
     val index: Int,
 )
