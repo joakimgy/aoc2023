@@ -1,6 +1,6 @@
 import utils.readRows
 
-fun main() {
+private fun main() {
     part1()
     part2()
 }
@@ -21,7 +21,7 @@ private fun part2() =
             .filter { it.hasValidPartNumber(listOf(gearSymbol)) }
             .let {
                 if (it.size == 2) {
-                    it.map { n -> n.number.toInt() }.reduce(Int::times)
+                    it.first().number.toInt() * it.last().number.toInt()
                 } else {
                     null
                 }
@@ -60,39 +60,43 @@ data class EnginePart(
 fun findEngineParts() =
     readRows("Task3_Input_1")
         .mapIndexed { rowIndex, row ->
-            val schematics = mutableListOf<MutableList<EnginePart>>()
-            row.mapIndexed { columnIndex, char ->
-                if (char.isDigit()) {
-                    EnginePart(number = char.toString(), coordinates = listOf(Coordinate(x = columnIndex, y = rowIndex)))
-                } else {
-                    null
-                }
-            }.forEach {
-                if (it == null) {
-                    schematics.add(mutableListOf())
-                } else {
-                    if (schematics.isEmpty()) {
-                        schematics.add(mutableListOf(it))
-                    } else {
-                        schematics.last().add(it)
-                    }
-                }
-            }
-
-            schematics.toList()
-                .map { it.toList() }
-                .filter { schematic ->
-                    schematic.isNotEmpty()
-                }.map {
-                    val coordinates = mutableListOf<Coordinate>()
-                    var number: String = ""
-                    it.forEach { c ->
-                        coordinates.add(c.coordinates.first())
-                        number += c.number
-                    }
-                    EnginePart(number = number, coordinates = coordinates)
-                }
+            parseRow(row, rowIndex)
         }.flatten()
+
+fun parseRow(row: String, rowIndex: Int): List<EnginePart> {
+    val schematics = mutableListOf<MutableList<EnginePart>>()
+    row.mapIndexed { columnIndex, char ->
+        if (char.isDigit()) {
+            EnginePart(number = char.toString(), coordinates = listOf(Coordinate(x = columnIndex, y = rowIndex)))
+        } else {
+            null
+        }
+    }.forEach {
+        if (it == null) {
+            schematics.add(mutableListOf())
+        } else {
+            if (schematics.isEmpty()) {
+                schematics.add(mutableListOf(it))
+            } else {
+                schematics.last().add(it)
+            }
+        }
+    }
+
+    return schematics.toList()
+        .map { it.toList() }
+        .filter { schematic ->
+            schematic.isNotEmpty()
+        }.map {
+            val coordinates = mutableListOf<Coordinate>()
+            var number: String = ""
+            it.forEach { c ->
+                coordinates.add(c.coordinates.first())
+                number += c.number
+            }
+            EnginePart(number = number, coordinates = coordinates)
+        }
+}
 
 private fun EnginePart.hasValidPartNumber(symbols: List<Symbol>): Boolean =
     symbols.any { symbol ->

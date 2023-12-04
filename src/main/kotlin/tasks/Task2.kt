@@ -1,6 +1,6 @@
 import utils.readRows
 
-fun main() {
+private fun main() {
     part1()
     part2()
 }
