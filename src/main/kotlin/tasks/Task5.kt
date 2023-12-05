@@ -14,14 +14,10 @@ private fun main() {
     part2()
 }
 
-private fun part1(): Long {
+private fun part1(): Long? {
     val seeds = readRows("Task5_Input_1").first().substringAfter(": ").split(" ").map { it.toLong() }
     val mappers = parseInput("Task5_Input_1")
-    return seeds
-        .parallelStream()
-        .map { findLocation("seed", it, mappers) }
-        .toList()
-        .min()
+    return seeds.minOfOrNull { findLocation("seed", it, mappers) }
 }
 
 fun findLocation(sourceCategory: String, source: Long, mappers: HashMap<String, List<CategoryMap>>): Long =
@@ -37,6 +33,27 @@ fun findLocation(sourceCategory: String, source: Long, mappers: HashMap<String, 
 
 private fun part2() {
     return
+}
+
+data class CategoryMap(
+    val source: String,
+    val destination: String,
+    val destinationRangeStart: Long,
+    val sourceRangeStart: Long,
+    val range: Long,
+)
+
+data class MapperResult(val destinationNumber: Long, val destinationCategory: String)
+
+private fun List<CategoryMap>.findDestination(sourceNumber: Long): MapperResult {
+    val destination = this.first().destination
+    this.forEach { map ->
+        if ((map.sourceRangeStart..map.sourceRangeStart + map.range).contains(sourceNumber)) {
+            val index = sourceNumber - map.sourceRangeStart
+            return MapperResult(destinationNumber = map.destinationRangeStart + index, destinationCategory = destination)
+        }
+    }
+    return MapperResult(destinationNumber = sourceNumber, destinationCategory = destination)
 }
 
 fun parseInput(filename: String): HashMap<String, List<CategoryMap>> {
@@ -67,27 +84,4 @@ fun parseInput(filename: String): HashMap<String, List<CategoryMap>> {
         }
     }
     return map
-}
-
-data class CategoryMap(
-    val source: String,
-    val destination: String,
-    val destinationRangeStart: Long,
-    val sourceRangeStart: Long,
-    val range: Long,
-)
-
-data class MapperResult(val destinationNumber: Long, val destinationCategory: String)
-
-private fun List<CategoryMap>.findDestination(sourceNumber: Long): MapperResult {
-    val destination = this.first().destination
-    this.forEach { map ->
-        (map.sourceRangeStart..map.sourceRangeStart + map.range)
-            .indexOf(sourceNumber)
-            .let {
-                if (it == -1) return@forEach
-                return MapperResult(destinationNumber = map.destinationRangeStart + it, destinationCategory = destination)
-            }
-    }
-    return MapperResult(destinationNumber = sourceNumber, destinationCategory = destination)
 }
