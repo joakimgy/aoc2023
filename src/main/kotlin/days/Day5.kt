@@ -18,6 +18,7 @@ class Day5 : Day {
             .map { (start, length) -> start until start + length }
 
         println("Running part 2 with ${seeds.sumOf { it.last - it.first + 1 }} seeds")
+
         var seedCount = 0L
         val onePercent = 2387882574L / 100L
         val mappers = parseInput("Task5_Input_1")
@@ -63,7 +64,7 @@ data class MapperResult(val destinationNumber: Long, val destinationCategory: St
 private fun List<CategoryMap>.findDestination(sourceNumber: Long): MapperResult {
     val destination = this.first().destination
     this.forEach { map ->
-        if ((map.sourceRangeStart..map.sourceRangeStart + map.range).contains(sourceNumber)) {
+        if ((map.sourceRangeStart until map.sourceRangeStart + map.range).contains(sourceNumber)) {
             return MapperResult(
                 destinationNumber = map.destinationRangeStart + (sourceNumber - map.sourceRangeStart),
                 destinationCategory = destination,
