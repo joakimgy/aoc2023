@@ -1,53 +1,42 @@
+import days.Day
 import utils.readFile
 import utils.readRows
 import kotlin.collections.HashMap
-import kotlin.time.ExperimentalTime
-import kotlin.time.measureTimedValue
 
-@OptIn(ExperimentalTime::class)
-private fun main() {
-    measureTimedValue {
-        part1()
-    }.let {
-        println("Part 1 answer: ${it.value} (${it.duration.inWholeMilliseconds} ms)")
+class Day5 : Day {
+
+    override fun part1(): String {
+        val seeds = readRows("Task5_Input_1").first().substringAfter(": ").split(" ").map { it.toLong() }
+        val mappers = parseInput("Task5_Input_1")
+        return seeds.minOfOrNull { findLocation("seed", it, mappers) }.toString()
     }
-    measureTimedValue {
-        part2()
-    }.let {
-        println("Part 2 answer: ${it.value} (${it.duration.inWholeMilliseconds} ms)")
+
+    override fun part2(): String {
+        val seeds = readRows("Task5_Input_1")
+            .first().substringAfter(": ").split(" ").map { it.toLong() }
+            .chunked(2)
+            .map { (start, length) -> start until start + length }
+
+        println("Running part 2 with ${seeds.sumOf { it.last - it.first + 1 }} seeds")
+        var seedCount = 0L
+        val onePercent = 2387882574L / 100L
+        val mappers = parseInput("Task5_Input_1")
+        return seeds
+            .asSequence()
+            .map { range ->
+                range
+                    .asSequence()
+                    .map {
+                        seedCount++
+                        if (seedCount % onePercent == 0L) {
+                            println("Computed $seedCount seeds (${seedCount / onePercent}%)")
+                        }
+                        findLocation("seed", it, mappers)
+                    }.min()
+            }
+            .min()
+            .toString()
     }
-}
-
-private fun part1(): Long? {
-    val seeds = readRows("Task5_Input_1").first().substringAfter(": ").split(" ").map { it.toLong() }
-    val mappers = parseInput("Task5_Input_1")
-    return seeds.minOfOrNull { findLocation("seed", it, mappers) }
-}
-
-private fun part2(): Long {
-    val seeds = readRows("Task5_Input_1")
-        .first().substringAfter(": ").split(" ").map { it.toLong() }
-        .chunked(2)
-        .map { (start, length) -> start until start + length }
-
-    println("Running part 2 with ${seeds.sumOf { it.last - it.first + 1 }} seeds")
-    var seedCount = 0L
-    val onePercent = 2387882574L / 100L
-    val mappers = parseInput("Task5_Input_1")
-    return seeds
-        .asSequence()
-        .map { range ->
-            range
-                .asSequence()
-                .map {
-                    seedCount++
-                    if (seedCount % onePercent == 0L) {
-                        println("Computed $seedCount seeds (${seedCount / onePercent}%)")
-                    }
-                    findLocation("seed", it, mappers)
-                }.min()
-        }
-        .min()
 }
 
 fun findLocation(sourceCategory: String, source: Long, mappers: HashMap<String, List<CategoryMap>>): Long =

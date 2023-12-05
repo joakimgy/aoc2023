@@ -1,34 +1,29 @@
+import days.Day
 import utils.readRows
 
-private fun main() {
-    part1()
-    part2()
-}
+class Day2 : Day {
 
-private fun part1() {
-    val rows = readRows("Task2_Input_1")
-    val validCubes = CubeSet(red = 12, green = 13, blue = 14)
-    rows
-        .map { rowToGame(it) }
-        .filter { it.hasValidSets(validCubes) }
-        .sumOf { it.gameNumber }
-        .also {
-            println("The sum of valid game IDs is $it")
-        }
-}
+    override fun part1(): String {
+        val rows = readRows("Task2_Input_1")
+        val validCubes = CubeSet(red = 12, green = 13, blue = 14)
+        return rows
+            .map { rowToGame(it) }
+            .filter { it.hasValidSets(validCubes) }
+            .sumOf { it.gameNumber }
+            .toString()
+    }
 
-private fun part2() {
-    val rows = readRows("Task2_Input_1")
-    rows
-        .map { rowToGame(it) }
-        .sumOf { game ->
-            game.sets.maxBy { it.green }.green *
-                game.sets.maxBy { it.blue }.blue *
-                game.sets.maxBy { it.red }.red
-        }
-        .also {
-            println(" The sum of the power of these sets are $it")
-        }
+    override fun part2(): String {
+        val rows = readRows("Task2_Input_1")
+        return rows
+            .map { rowToGame(it) }
+            .sumOf { game ->
+                game.sets.maxBy { it.green }.green *
+                    game.sets.maxBy { it.blue }.blue *
+                    game.sets.maxBy { it.red }.red
+            }
+            .toString()
+    }
 }
 
 private fun Game.hasValidSets(validSet: CubeSet): Boolean {
