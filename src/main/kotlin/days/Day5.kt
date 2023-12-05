@@ -1,5 +1,5 @@
+import utils.readFile
 import utils.readRows
-import java.io.File
 import kotlin.collections.HashMap
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -88,7 +88,7 @@ fun parseInput(filename: String): HashMap<String, List<CategoryMap>> {
     val map: HashMap<String, List<CategoryMap>> = HashMap()
     var lastSource = ""
     var lastDestination = ""
-    File("src/main/kotlin/tasks/$filename").forEachLine { line ->
+    readFile(filename).forEachLine { line ->
         if (line.startsWith("seeds")) {
             return@forEachLine
         } else if (line.isEmpty()) {
