@@ -1,36 +1,30 @@
+import days.Day
 import utils.readRows
 
-private fun main() {
-    part1()
-    part2()
-}
-
-private fun part1() {
-    val allSymbols = findSymbols(null)
-    findEngineParts()
-        .filter { it.hasValidPartNumber(allSymbols) }
-        .sumOf { it.number.toInt() }
-        .let {
-            println("The sum of the part numbers is $it")
-        }
-}
-
-private fun part2() =
-    findSymbols('*').mapNotNull { gearSymbol ->
-        findEngineParts()
-            .filter { it.hasValidPartNumber(listOf(gearSymbol)) }
-            .let {
-                if (it.size == 2) {
-                    it.first().number.toInt() * it.last().number.toInt()
-                } else {
-                    null
-                }
-            }
+class Day3 : Day {
+    override fun part1(): String {
+        val allSymbols = findSymbols(null)
+        return findEngineParts()
+            .filter { it.hasValidPartNumber(allSymbols) }
+            .sumOf { it.number.toInt() }
+            .toString()
     }
-        .sum()
-        .let {
-            println("Sum of the gear ratios is $it")
+
+    override fun part2(): String =
+        findSymbols('*').mapNotNull { gearSymbol ->
+            findEngineParts()
+                .filter { it.hasValidPartNumber(listOf(gearSymbol)) }
+                .let {
+                    if (it.size == 2) {
+                        it.first().number.toInt() * it.last().number.toInt()
+                    } else {
+                        null
+                    }
+                }
         }
+            .sum()
+            .toString()
+}
 
 data class Symbol(
     val symbol: Char,
