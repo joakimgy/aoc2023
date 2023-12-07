@@ -45,4 +45,5 @@ val days: List<Day> = listOf(
     Day4(),
     Day5(),
     Day6(),
+    Day7(),
 )
