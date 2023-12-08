@@ -17,10 +17,7 @@ class Day5 : Day {
             .chunked(2)
             .map { (start, length) -> start until start + length }
 
-        println("Running part 2 with ${seeds.sumOf { it.last - it.first + 1 }} seeds")
-
         var seedCount = 0L
-        val onePercent = 2387882574L / 100L
         val mappers = parseInput("Task5_Input_1")
         return seeds
             .asSequence()
@@ -29,9 +26,6 @@ class Day5 : Day {
                     .asSequence()
                     .map {
                         seedCount++
-                        if (seedCount % onePercent == 0L) {
-                            println("Computed $seedCount seeds (${seedCount / onePercent}%)")
-                        }
                         findLocation("seed", it, mappers)
                     }.min()
             }

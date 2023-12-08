@@ -5,36 +5,45 @@ import Day2
 import Day3
 import Day4
 import Day5
+import kotlinx.coroutines.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
-fun main() {
-    runLatest()
+suspend fun main() {
+    runAll()
 }
 
-fun runAll() {
+suspend fun runAll() {
     days.forEachIndexed { index, day ->
-        runDay(day, index + 1)
+        runDay(day, index + 1, 2000L)
     }
 }
 
-fun runLatest() {
+suspend fun runLatest() {
     days.last().also {
         runDay(it, days.size)
     }
 }
 
-@OptIn(ExperimentalTime::class)
-fun runDay(day: Day, dayNumber: Int) {
-    measureTimedValue {
-        day.part1()
-    }.let {
-        println("Day $dayNumber Part 1: ${it.value} (${it.duration})")
-    }
-    measureTimedValue {
-        day.part2()
-    }.let {
-        println("Day $dayNumber Part 2: ${it.value} (${it.duration})")
+@OptIn(ExperimentalTime::class, DelicateCoroutinesApi::class)
+suspend fun runDay(day: Day, dayNumber: Int, timeoutMs: Long? = null) {
+    try {
+        withTimeout(timeoutMs ?: (1000 * 60 * 60L)) {
+            GlobalScope.launch(Dispatchers.IO) {
+                measureTimedValue {
+                    day.part1()
+                }.let {
+                    println("Day $dayNumber Part 1: ${it.value} (${it.duration})")
+                }
+                measureTimedValue {
+                    day.part2()
+                }.let {
+                    println("Day $dayNumber Part 2: ${it.value} (${it.duration})")
+                }
+            }.join()
+        }
+    } catch (e: TimeoutCancellationException) {
+        println("Skipping Day $dayNumber because it timed out")
     }
 }
 
@@ -46,5 +55,5 @@ val days: List<Day> = listOf(
     Day5(),
     Day6(),
     Day7(),
-    // Day8(),
+    Day8(),
 )
