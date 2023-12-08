@@ -8,12 +8,7 @@ class Day7 : Day {
     override fun part1(): String {
         return readRows("Day7")
             .map { row -> row.toHand() }
-            .sortedWith { h1, h2 -> Type.values().indexOf(h1.type) - Type.values().indexOf(h2.type) }
-            .groupBy { it.type }
-            .flatMap { (_, hands) -> hands.sortedWith(handComparator(cardRatingPart1)) }
-            .reversed()
-            .mapIndexed { index, hand -> (index + 1) * hand.bid }
-            .sum()
+            .countTotalWinnings(cardRatingPart1)
             .toString()
     }
 
@@ -31,12 +26,7 @@ class Day7 : Day {
                         )
                     }
             }
-            .sortedWith { h1, h2 -> Type.values().indexOf(h1.type) - Type.values().indexOf(h2.type) }
-            .groupBy { it.type }
-            .flatMap { (_, hands) -> hands.sortedWith(handComparator(cardRatingPart2)) }
-            .reversed()
-            .mapIndexed { index, hand -> (index + 1) * hand.bid }
-            .sum()
+            .countTotalWinnings(cardRatingPart2)
             .toString()
     }
 }
@@ -78,6 +68,14 @@ fun handComparator(cardRating: List<Char>) = Comparator<Hand> { h1, h2 ->
         }
     }
 }
+
+private fun List<Hand>.countTotalWinnings(cardRating: List<Char>) = this
+    .sortedWith { h1, h2 -> Type.values().indexOf(h1.type) - Type.values().indexOf(h2.type) }
+    .groupBy { it.type }
+    .flatMap { (_, hands) -> hands.sortedWith(handComparator(cardRating)) }
+    .reversed()
+    .mapIndexed { index, hand -> (index + 1) * hand.bid }
+    .sum()
 
 fun String.toType(): Type =
     this
