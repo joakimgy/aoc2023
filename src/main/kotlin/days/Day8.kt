@@ -15,7 +15,7 @@ class Day8 : Day {
             ).toString()
         }
 
-    override fun part2(): String = readRows("Day8_2")
+    override fun part2(): String = readRows("Day8")
         .let { rows ->
             val networkMap = rows.toNetworkMap()
             networkMap.keys.filter { it.last() == 'A' }
