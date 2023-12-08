@@ -2,6 +2,13 @@ package days
 
 import utils.readRows
 
+data class Hand(
+    val type: Type,
+    val cards: String,
+    val bid: Int,
+)
+enum class Type { FiveOfAKind, FourOfAKind, FullHouse, ThreeOfAKind, TwoPair, OnePair, HighCard, }
+
 class Day7 : Day {
 
     private val cardRatingPart1 = listOf('A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2')
@@ -15,36 +22,10 @@ class Day7 : Day {
     private val cardRatingPart2 = listOf('A', 'K', 'Q', 'T', '9', '8', '7', '6', '5', '4', '3', '2', 'J')
     override fun part2(): String {
         return readRows("Day7")
-            .map { row ->
-                row
-                    .split(" ")
-                    .let {
-                        Hand(
-                            type = it.first().toTypeWithJoker(cardRatingPart2),
-                            cards = it.first(),
-                            bid = it.last().toInt(),
-                        )
-                    }
-            }
+            .map { row -> row.toHandWithJoker() }
             .countTotalWinnings(cardRatingPart2)
             .toString()
     }
-}
-
-data class Hand(
-    val type: Type,
-    val cards: String,
-    val bid: Int,
-)
-
-enum class Type {
-    FiveOfAKind,
-    FourOfAKind,
-    FullHouse,
-    ThreeOfAKind,
-    TwoPair,
-    OnePair,
-    HighCard,
 }
 
 private fun String.toHand() = this
@@ -99,45 +80,41 @@ fun List<Int>.toType(): Type {
         return Type.OnePair
     } else if (this.size == 5) {
         return Type.HighCard
+    } else if (this.isEmpty()) {
+        return Type.FiveOfAKind
+    } else if (this.contains(1)) {
+        return Type.HighCard
     } else {
-        throw Error("Could not find type  for hand_ $this")
+        throw Error("Can not find type for $this")
     }
 }
 
-fun String.toTypeWithJoker(cardRatingPart2: List<Char>): Type =
+private fun String.toHandWithJoker() = this.toHand().let { it.copy(type = it.cards.toTypeWithJoker()) }
+fun String.toTypeWithJoker(): Type =
     this
         .map { c -> Pair(c, this.count { c == it }) }
-        .let { cards ->
-            val numberOfJs = cards.find { it.first == 'J' }?.second
-            when (numberOfJs) {
-                5 -> {
-                    cards
-                }
-                null -> {
-                    cards
-                }
-                else -> {
-                    val maxOccurences = cards.filter { it.first != 'J' }.maxOf { it.second }
-                    var didUseJs = false
-                    cards
-                        .sortedWith { h1, h2 ->
-                            val c1Value = cardRatingPart2.indexOf(h1.first)
-                            val c2Value = cardRatingPart2.indexOf(h2.first)
-                            c1Value - c2Value
-                        }
-                        .mapNotNull {
-                            if (it.second == maxOccurences && it.first != 'J' && !didUseJs) {
-                                didUseJs = true
-                                Pair(it.first, it.second + numberOfJs)
-                            } else if (it.first == 'J') {
-                                null
-                            } else {
-                                it
-                            }
-                        }
-                }
-            }
-        }
         .distinctBy { it.first }
+        .filter { it.first != 'J' }
         .map { it.second }
         .toType()
+        .let { type ->
+            val numberOfJokers = this.filter { it == 'J' }.length
+            when (type to numberOfJokers) {
+                Type.FourOfAKind to 1 -> Type.FiveOfAKind
+                Type.FullHouse to 1 -> Type.FourOfAKind
+                Type.FullHouse to 2 -> Type.FiveOfAKind
+                Type.ThreeOfAKind to 1 -> Type.FourOfAKind
+                Type.ThreeOfAKind to 2 -> Type.FiveOfAKind
+                Type.TwoPair to 1 -> Type.FullHouse
+                Type.TwoPair to 2 -> Type.FourOfAKind
+                Type.TwoPair to 3 -> Type.FiveOfAKind
+                Type.OnePair to 1 -> Type.ThreeOfAKind
+                Type.OnePair to 2 -> Type.FourOfAKind
+                Type.OnePair to 3 -> Type.FiveOfAKind
+                Type.HighCard to 1 -> Type.OnePair
+                Type.HighCard to 2 -> Type.ThreeOfAKind
+                Type.HighCard to 3 -> Type.FourOfAKind
+                Type.HighCard to 4 -> Type.FiveOfAKind
+                else -> type
+            }
+        }
