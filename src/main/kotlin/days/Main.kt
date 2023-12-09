@@ -10,7 +10,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 suspend fun main() {
-    runAll()
+    runLatest()
 }
 
 suspend fun runAll() {
@@ -56,4 +56,5 @@ val days: List<Day> = listOf(
     Day6(),
     Day7(),
     Day8(),
+    Day9(),
 )
