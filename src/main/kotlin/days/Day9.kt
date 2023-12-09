@@ -40,20 +40,15 @@ private fun List<Int>.createPyramid(): MutableMap<Int, List<Int>> {
 
 private fun MutableMap<Int, List<Int>>.extraPolate(backwards: Boolean = false): MutableMap<Int, List<Int>> {
     val largestIndex = this.maxOf { (key, _) -> key }
-    (0..largestIndex).reversed().forEach { index ->
-        when (index) {
-            largestIndex -> {
-                this[index] = this[index]!!.plus(listOf(0))
-            }
-            else -> {
-                if (backwards) {
-                    val extrapolatedValue = this[index]!!.first() - this[index + 1]!!.first()
-                    this[index] = listOf(extrapolatedValue).plus(this[index]!!)
-                } else {
-                    val extrapolatedValue = this[index]!!.last() + this[index + 1]!!.last()
-                    this[index] = this[index]!!.plus(extrapolatedValue)
-                }
-            }
+
+    this[largestIndex] = this[largestIndex]!!.plus(listOf(0))
+    (0 until largestIndex).reversed().forEach { index ->
+        if (backwards) {
+            val extrapolatedValue = this[index]!!.first() - this[index + 1]!!.first()
+            this[index] = listOf(extrapolatedValue).plus(this[index]!!)
+        } else {
+            val extrapolatedValue = this[index]!!.last() + this[index + 1]!!.last()
+            this[index] = this[index]!!.plus(extrapolatedValue)
         }
     }
     return this
