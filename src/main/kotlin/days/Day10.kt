@@ -24,7 +24,31 @@ class Day10 : Day {
         }
         .toString()
 
-    override fun part2(): String = ""
+    /** Had to get some help on part 2. Used Pick's theorem together with the Shoelace formula to calculate
+     * the interior points of the loop-polygon */
+    override fun part2(): String = readRows("Day10")
+        .map { row ->
+            row.map { Pipe.from(c = it) }
+        }
+        .let { grid ->
+            val startPosition = grid.findStart()
+            val history = mutableListOf(startPosition)
+            while (true) {
+                val nextPosition = grid.moveToNextPipe(history)
+                if (nextPosition == startPosition) break
+                history.add(nextPosition)
+            }
+            history.toList()
+        }
+        .let { history ->
+            val area = history.reversed().calculateArea()
+
+            calculateNumberOfInteriorPoints(
+                area = history.reversed().calculateArea().toInt(),
+                numberOfPoints = history.size,
+            )
+        }
+        .toString()
 }
 
 private fun List<List<Pipe>>.findStart(): Pair<Int, Int> =
@@ -158,4 +182,17 @@ private fun Pipe.connectsToEast(other: Pipe): Boolean {
         }
         else -> false
     }
+}
+
+/** Shoelace formula */
+private fun List<Pair<Int, Int>>.calculateArea(): Double {
+    return this.withIndex().sumOf {
+        val nextIndex = if (it.index + 1 == this.size) 0 else it.index + 1
+        (this[it.index].second + this[nextIndex].second) * (this[it.index].first - this[nextIndex].first)
+    } * (1.0 / 2.0)
+}
+
+/** Pick's theorem */
+private fun calculateNumberOfInteriorPoints(area: Int, numberOfPoints: Int): Int {
+    return area - numberOfPoints / 2 + 1
 }
